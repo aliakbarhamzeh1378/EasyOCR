@@ -1,12 +1,10 @@
 import os
-import sys
 import re
-import six
 import math
 import torch
 import pandas  as pd
+from tqdm import tqdm
 
-from natsort import natsorted
 from PIL import Image
 import numpy as np
 from torch.utils.data import Dataset, ConcatDataset, Subset
@@ -96,14 +94,14 @@ class Batch_Balanced_Dataset(object):
         balanced_batch_images = []
         balanced_batch_texts = []
 
-        for i, data_loader_iter in enumerate(self.dataloader_iter_list):
+        for i, data_loader_iter in tqdm(enumerate(self.dataloader_iter_list), total=len(self.dataloader_iter_list)):
             try:
-                image, text = data_loader_iter.next()
+                image, text = next(data_loader_iter)
                 balanced_batch_images.append(image)
                 balanced_batch_texts += text
             except StopIteration:
                 self.dataloader_iter_list[i] = iter(self.data_loader_list[i])
-                image, text = self.dataloader_iter_list[i].next()
+                image, text = next(self.dataloader_iter_list[i])
                 balanced_batch_images.append(image)
                 balanced_batch_texts += text
             except ValueError:
@@ -146,7 +144,7 @@ class OCRDataset(Dataset):
         self.root = root
         self.opt = opt
         print(root)
-        self.df = pd.read_csv(os.path.join(root,'labels.csv'), sep='^([^,]+),', engine='python', usecols=['filename', 'words'], keep_default_na=False)
+        self.df = pd.read_csv(os.path.join(root,opt.label_filename), sep='^([^,]+),', engine='python', keep_default_na=False)
         self.nSamples = len(self.df)
 
         if self.opt.data_filtering_off:
@@ -154,7 +152,7 @@ class OCRDataset(Dataset):
         else:
             self.filtered_index_list = []
             for index in range(self.nSamples):
-                label = self.df.at[index,'words']
+                label = self.df.iloc[index, 2]
                 try:
                     if len(label) > self.opt.batch_max_length:
                         continue
@@ -171,9 +169,9 @@ class OCRDataset(Dataset):
 
     def __getitem__(self, index):
         index = self.filtered_index_list[index]
-        img_fname = self.df.at[index,'filename']
+        img_fname = self.df.iloc[index,1]
         img_fpath = os.path.join(self.root, img_fname)
-        label = self.df.at[index,'words']
+        label = self.df.iloc[index,2]
 
         if self.opt.rgb:
             img = Image.open(img_fpath).convert('RGB')  # for color image
