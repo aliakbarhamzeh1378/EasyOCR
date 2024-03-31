@@ -94,7 +94,7 @@ class Batch_Balanced_Dataset(object):
         balanced_batch_images = []
         balanced_batch_texts = []
 
-        for i, data_loader_iter in tqdm(enumerate(self.dataloader_iter_list), total=len(self.dataloader_iter_list)):
+        for i, data_loader_iter in enumerate(self.dataloader_iter_list):
             try:
                 image, text = next(data_loader_iter)
                 balanced_batch_images.append(image)
