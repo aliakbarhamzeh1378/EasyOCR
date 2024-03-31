@@ -144,7 +144,7 @@ class OCRDataset(Dataset):
         self.root = root
         self.opt = opt
         print(root)
-        self.df = pd.read_csv(os.path.join(root,opt.label_filename), sep='^([^,]+),', engine='python', keep_default_na=False)
+        self.df = pd.read_csv(os.path.join(root,opt.label_filename), sep='|', engine='python', keep_default_na=False)
         self.nSamples = len(self.df)
 
         if self.opt.data_filtering_off:
@@ -152,7 +152,7 @@ class OCRDataset(Dataset):
         else:
             self.filtered_index_list = []
             for index in range(self.nSamples):
-                label = self.df.iloc[index, 2]
+                label = self.df.iloc[index, 1]
                 try:
                     if len(label) > self.opt.batch_max_length:
                         continue
@@ -169,9 +169,9 @@ class OCRDataset(Dataset):
 
     def __getitem__(self, index):
         index = self.filtered_index_list[index]
-        img_fname = self.df.iloc[index,1]
+        img_fname = self.df.iloc[index,0]
         img_fpath = os.path.join(self.root, img_fname)
-        label = self.df.iloc[index,2]
+        label = self.df.iloc[index,1]
 
         if self.opt.rgb:
             img = Image.open(img_fpath).convert('RGB')  # for color image
