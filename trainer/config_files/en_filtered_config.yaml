@@ -2,8 +2,8 @@ number: '0123456789'
 symbol: "!\"#$%&'()*+,-./:;<=>?@[\\]^_`{|}~ €"
 lang_char: 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz'
 experiment_name: 'train1'
-train_data: '/mmocr/data/train/dataset/rec/easy_ocr'
-valid_data: '/mmocr/data/train/dataset/rec/easy_ocr/test'
+train_data: '/data/dataset_easyocr'
+valid_data: '/data/dataset_easyocr'
 label_filename: 'labels.csv'
 manualSeed: 1111
 workers: 6
@@ -19,7 +19,7 @@ rho: 0.95
 eps: 0.00000001
 grad_clip: 5
 #Data processing
-select_data: 'train' # this is dataset folder in train_data
+select_data: '' # this is dataset folder in train_data
 batch_ratio: '1' 
 total_data_usage_ratio: 1.0
 batch_max_length: 34 
